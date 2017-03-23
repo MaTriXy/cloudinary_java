@@ -7,10 +7,8 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.apache.http.HttpHost;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.HttpMultipartMode;
@@ -99,7 +97,7 @@ public class UploaderStrategy extends AbstractUploaderStrategy {
             }
         }
 
-        if (file instanceof String && !((String) file).matches("ftp:.*|https?:.*|s3:.*|data:[^;]*;base64,([a-zA-Z0-9/+\n=]+)")) {
+        if (file instanceof String && !StringUtils.isRemoteUrl((String) file)) {
             File _file = new File((String) file);
             if (!_file.isFile() && !_file.canRead()) {
                 throw new IOException("File not found or unreadable: " + file);
