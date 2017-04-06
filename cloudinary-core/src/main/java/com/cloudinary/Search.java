@@ -42,7 +42,7 @@ public class Search {
         return this;
     }
 
-    public Search includes(String field) {
+    public Search include(String field) {
         includesParam.add(field);
         return this;
     }
@@ -56,7 +56,7 @@ public class Search {
 
     public HashMap<String, Object> toQuery() {
         HashMap<String, Object> queryParams = new HashMap<String, Object>(this.params);
-        queryParams.put("includes", includesParam);
+        queryParams.put("include", includesParam);
         queryParams.put("sort_by", sortByParam);
         queryParams.put("aggregate", aggregateParam);
         return queryParams;
