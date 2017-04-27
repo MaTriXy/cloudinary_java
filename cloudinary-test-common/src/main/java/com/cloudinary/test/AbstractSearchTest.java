@@ -56,14 +56,14 @@ abstract public class AbstractSearchTest extends MockableTest {
 
     @Test
     public void shouldFindResourcesByTag() throws Exception {
-        Map result = cloudinary.search().expression("tags:%s", SEARCH_TAG).execute();
+        Map result = cloudinary.search().expression(String.format("tags:%s", SEARCH_TAG)).execute();
         List<Map> resources = (List<Map>) result.get("resources");
         assertEquals(3, resources.size());
     }
 
     @Test
     public void shouldFindResourceByPublicId() throws Exception {
-        Map result = cloudinary.search().expression("public_id:%s", API_TEST_1).execute();
+        Map result = cloudinary.search().expression(String.format("public_id:%s", API_TEST_1)).execute();
         List<Map> resources = (List<Map>) result.get("resources");
         assertEquals(1, resources.size());
     }
@@ -71,7 +71,7 @@ abstract public class AbstractSearchTest extends MockableTest {
     @Test
     public void shouldPaginateResourcesLimitedByTagAndOrderdByAscendingPublicId() throws Exception {
         List<Map> resources;
-        Map result = cloudinary.search().maxResults(1).expression("tags:%s", SEARCH_TAG).sortBy("public_id", "asc").execute();
+        Map result = cloudinary.search().maxResults(1).expression(String.format("tags:%s", SEARCH_TAG)).sortBy("public_id", "asc").execute();
         resources = (List<Map>) result.get("resources");
 
         assertEquals(1, resources.size());
@@ -79,7 +79,7 @@ abstract public class AbstractSearchTest extends MockableTest {
         assertEquals(API_TEST, resources.get(0).get("public_id"));
 
 
-        result = cloudinary.search().maxResults(1).expression("tags:%s", SEARCH_TAG).sortBy("public_id", "asc")
+        result = cloudinary.search().maxResults(1).expression(String.format("tags:%s", SEARCH_TAG)).sortBy("public_id", "asc")
                 .nextCursor(ObjectUtils.asString(result.get("next_cursor"))).execute();
         resources = (List<Map>) result.get("resources");
 
@@ -87,18 +87,15 @@ abstract public class AbstractSearchTest extends MockableTest {
         assertEquals(3, result.get("total_count"));
         assertEquals(API_TEST_1, resources.get(0).get("public_id"));
 
-        result = cloudinary.search().maxResults(1).expression("tags:%s", SEARCH_TAG).sortBy("public_id", "asc")
+        result = cloudinary.search().maxResults(1).expression(String.format("tags:%s", SEARCH_TAG)).sortBy("public_id", "asc")
                 .nextCursor(ObjectUtils.asString(result.get("next_cursor"))).execute();
         resources = (List<Map>) result.get("resources");
 
         assertEquals(1, resources.size());
         assertEquals(3, result.get("total_count"));
         assertEquals(API_TEST_2, resources.get(0).get("public_id"));
+        assertNull(result.get("next_cursor"));
 
-        result = cloudinary.search().maxResults(1).expression("tags:%s", SEARCH_TAG).sortBy("public_id", "asc")
-                .nextCursor(ObjectUtils.asString(result.get("next_cursor"))).execute();
-        resources = (List<Map>) result.get("resources");
 
-        assertEquals(0, resources.size());
     }
 }
