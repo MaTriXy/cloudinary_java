@@ -57,7 +57,7 @@ public class Cloudinary {
     }
 
     public Search search() {
-        return new Search();
+        return new Search(this);
     }
 
     public static void registerUploaderStrategy(String className) {
