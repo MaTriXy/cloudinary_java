@@ -11,7 +11,6 @@ import com.cloudinary.utils.ObjectUtils;
 import com.cloudinary.utils.StringUtils;
 import org.apache.http.Consts;
 import org.apache.http.HttpHost;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.*;
@@ -22,7 +21,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 import org.cloudinary.json.JSONException;
 import org.cloudinary.json.JSONObject;
 
@@ -32,7 +30,7 @@ import java.lang.reflect.Constructor;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.cloudinary.http43.ApiUtils.prepareParams;
@@ -143,7 +141,7 @@ public class ApiStrategy extends com.cloudinary.strategies.AbstractApiStrategy {
 
         String contentType = ObjectUtils.asString(options.get("content_type"), "urlencoded");
         URIBuilder apiUrlBuilder = new URIBuilder(apiUrl);
-        List<NameValuePair> urlEncodedParams = prepareParams(params);
+        HashMap<String,Object>  unboxedParams = new  HashMap<String,Object>(params);
 
         if (method == HttpMethod.GET) {
             apiUrlBuilder.setParameters(prepareParams(params));
@@ -156,7 +154,7 @@ public class ApiStrategy extends com.cloudinary.strategies.AbstractApiStrategy {
                     request = new HttpPut(apiUri);
                     break;
                 case DELETE: //uses HttpPost instead of HttpDelete
-                    ((Map<String, Object>) params).put("_method", "delete");
+                    unboxedParams.put("_method","delete");
                     //continue with POST
                 case POST:
                     request = new HttpPost(apiUri);
@@ -165,11 +163,11 @@ public class ApiStrategy extends com.cloudinary.strategies.AbstractApiStrategy {
                     throw new IllegalArgumentException("Unknown HTTP method");
             }
             if (contentType.equals("json")) {
-                JSONObject asJSON = ObjectUtils.toJSON(params);
+                JSONObject asJSON = ObjectUtils.toJSON(unboxedParams);
                 StringEntity requestEntity = new StringEntity(asJSON.toString(), ContentType.APPLICATION_JSON);
                 ((HttpEntityEnclosingRequestBase) request).setEntity(requestEntity);
             } else {
-                ((HttpEntityEnclosingRequestBase) request).setEntity(new UrlEncodedFormEntity(prepareParams(params), Consts.UTF_8));
+                ((HttpEntityEnclosingRequestBase) request).setEntity(new UrlEncodedFormEntity(prepareParams(unboxedParams), Consts.UTF_8));
             }
         }
 
